@@ -2,6 +2,7 @@ package com.example.rsser.DAO;
 
 import androidx.room.Entity;
 import androidx.room.ForeignKey;
+import androidx.room.Ignore;
 import androidx.room.Index;
 import androidx.room.PrimaryKey;
 
@@ -17,6 +18,16 @@ import java.io.Serializable;
     indices = {@Index(value = "sourceId")}
 )
 public class Item implements Serializable {
+
+    public Item(int sourceId, String title, String link, String description) {
+        this.sourceId = sourceId;
+        this.title = title;
+        this.link = link;
+        this.description = description;
+    }
+    @Ignore
+    public Item(){}
+
     public int getId() {
         return id;
     }
@@ -27,14 +38,6 @@ public class Item implements Serializable {
 
     public void setId(int id) {
         this.id = id;
-    }
-
-    public void setPubdate(long pubdate) {
-        this.pubdate = pubdate;
-    }
-
-    public void setContent(String content) {
-        this.content = content;
     }
 
     public void setTitle(String title) {
@@ -61,14 +64,6 @@ public class Item implements Serializable {
         return description;
     }
 
-    public String getContent() {
-        return content;
-    }
-
-    public long getPubdate() {
-        return pubdate;
-    }
-
     public String getLink() {
         return link;
     }
@@ -80,6 +75,4 @@ public class Item implements Serializable {
     private String title;
     private String link;
     private String description;
-    private String content;
-    private long pubdate;
 }

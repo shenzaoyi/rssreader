@@ -29,7 +29,7 @@ android {
 }
 
 dependencies {
-
+    implementation libs.material.v160
     implementation libs.appcompat
     implementation libs.material
     testImplementation libs.junit
@@ -37,8 +37,7 @@ dependencies {
     androidTestImplementation libs.espresso.core
 }
 dependencies {
-
-
+    implementation "androidx.drawerlayout:drawerlayout:1.2.0"
     implementation libs.recyclerview
     implementation libs.appcompat
     implementation libs.material

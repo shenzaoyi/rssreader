@@ -1,6 +1,7 @@
 package com.example.rsser.View.Index;
 
 import android.content.Context;
+import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -10,6 +11,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.rsser.R;
+import com.example.rsser.View.Detail.DetailActivity;
 
 
 import java.util.List;
@@ -23,8 +25,8 @@ public class IndexAdpter extends RecyclerView.Adapter<IndexAdpter.ViewHolder> {
     public static class Item {
         String title;
         String content;
-        String url;
-        String src;
+        String url; // 此 Item 的链接
+        String src; // Source 的名称
         String pubdata;
         public Item(String title, String pubdata, String src, String url, String content) {
             this.title = title;
@@ -32,6 +34,10 @@ public class IndexAdpter extends RecyclerView.Adapter<IndexAdpter.ViewHolder> {
             this.src = src;
             this.url = url;
             this.content = content;
+        }
+
+        public String getTitle() {
+            return this.title;
         }
     }
 
@@ -52,10 +58,19 @@ public class IndexAdpter extends RecyclerView.Adapter<IndexAdpter.ViewHolder> {
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         Item item = itemList.get(position);
         holder.title.setText(item.title);
-        holder.content.setText(item.content);
+//        holder.content.setText(item.content);
 //        holder.headerImage.setImageResource(item.url);
         holder.src.setText(item.src);
         holder.pubdata.setText(item.pubdata);
+        holder.itemView.setOnClickListener(v -> {
+            Intent intent = new Intent(context, DetailActivity.class);  // 创建一个意图，用于启动 DetailActivity
+            intent.putExtra("title", item.title);
+            intent.putExtra("content", item.content);
+            intent.putExtra("url", item.url);
+            intent.putExtra("src", item.src);
+            intent.putExtra("pubdata", item.pubdata);
+            context.startActivity(intent); // 使用上下文启动 DetailActivity
+        });
     }
 
     @Override
@@ -73,9 +88,9 @@ public class IndexAdpter extends RecyclerView.Adapter<IndexAdpter.ViewHolder> {
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
-            headerImage = itemView.findViewById(R.id.header_image);
+//            headerImage = itemView.findViewById(R.id.header_image);
             title = itemView.findViewById(R.id.title);
-            content = itemView.findViewById(R.id.content);
+//            content = itemView.findViewById(R.id.content);
             src = itemView.findViewById(R.id.src);
             pubdata = itemView.findViewById(R.id.pubdata);
         }

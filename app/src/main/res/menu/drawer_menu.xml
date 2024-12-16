@@ -1,0 +1,14 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/menu_header"
+        android:title="订阅源"
+        android:icon="@drawable/menu" />
+    <item
+        android:id="@+id/nav_item1"
+        android:title="知乎 1"
+        android:icon="@drawable/menu" />
+    <item
+        android:id="@+id/nav_item2"
+        android:title="少林派 2"
+        android:icon="@drawable/more" />
+</menu>

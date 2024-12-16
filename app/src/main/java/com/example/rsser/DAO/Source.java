@@ -22,6 +22,14 @@ public class Source implements Serializable {
         this.last_updated = last_updated;
     }
 
+    public Source(String url, String title, String description, String feedType, long last_updated) {
+        this.url = url;
+        this.title = title;
+        this.description = description;
+        this.feedType = feedType;
+        this.last_updated = last_updated;
+    }
+
     public void setFeedType(String feedType) {
         this.feedType = feedType;
     }

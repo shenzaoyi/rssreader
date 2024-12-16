@@ -24,4 +24,12 @@ public interface SourceDao {
     // 根据 ID 查询指定的 RSS 源
     @Query("SELECT * FROM rss_source WHERE id = :id")
     Source getSourceById(int id);
+
+    // 检查是否存在指定sid且last_updated>指定日期
+    @Query("SELECT * FROM rss_source WHERE id = :sid AND last_updated > :date")
+    List<Source> getSouBySidData(int sid, long date);
+    @Query("SELECT COUNT(*) FROM rss_source")
+    int getTableSize();
+    @Query("SELECT * FROM rss_source LIMIT 1")
+    Source getFirstSource();
 }
