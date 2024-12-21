@@ -22,5 +22,9 @@
         <activity android:name=".View.Index.IndexActivity"></activity>
         <activity android:name=".View.RssManager.AddRssActivity"></activity>
         <activity android:name=".View.Detail.DetailActivity"></activity>
+        <activity android:name=".View.RssManager.RssTypeAct"></activity>
+        <activity android:name=".View.RssManager.SourceListActivity" />
+        <activity android:name=".View.RssManager.SourceDetailActivity"/>
+
     </application>
 </manifest>

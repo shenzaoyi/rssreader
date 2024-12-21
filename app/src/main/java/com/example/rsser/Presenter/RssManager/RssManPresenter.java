@@ -4,6 +4,7 @@ package com.example.rsser.Presenter.RssManager;
 import com.example.rsser.DAO.Item;
 import com.example.rsser.DAO.Respositories;
 import com.example.rsser.DAO.Source;
+import com.example.rsser.DAO.Type;
 import com.example.rsser.Model.RssMan.RssManModel;
 import com.example.rsser.View.RssManager.AddRssActivity;
 import com.example.rsser.base.BasePresenter;
@@ -30,5 +31,15 @@ public class RssManPresenter extends BasePresenter<AddRssActivity> implements Rs
         }
         rssManModel.saveItems(items);
         baseView.onSuccess();
+    }
+
+    @Override
+    public List<Type> loadType() {
+        return rssManModel.loadType();
+    }
+
+    @Override
+    public long addType(Type t) {
+        return rssManModel.addType(t);
     }
 }

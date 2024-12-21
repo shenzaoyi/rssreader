@@ -1,15 +1,12 @@
 package com.example.rsser.Model.RssMan;
 
-import androidx.annotation.Nullable;
-
 import com.example.rsser.DAO.Item;
 import com.example.rsser.DAO.Respositories;
 import com.example.rsser.DAO.Source;
-import com.example.rsser.View.RssManager.RssManInt;
+import com.example.rsser.DAO.Type;
 import com.example.rsser.base.BaseModel;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
@@ -39,9 +36,34 @@ public class RssManModel extends BaseModel implements RssManModelInt {
         }
         return -1L;
     }
-
     @Override
     public void saveItems(List<Item> items) {
         respos.insertItems(items);
+    }
+
+    public List<Type> loadType() {
+        Future<List<Type>> f = respos.getAllTypes();
+        List<Type> lists = new ArrayList<>();
+        try {
+            lists = f.get();
+            return lists;
+        } catch (ExecutionException e) {
+            System.out.println("Load Type Error at RssManModel");
+            throw new RuntimeException(e);
+        } catch (InterruptedException e) {
+            System.out.println("Load type Error at RssManModel InterruapedException");
+            throw new RuntimeException(e);
+        }
+    }
+    public long addType(Type t) {
+        long res = -1;
+        try {
+            res = respos.insertType(t).get();
+            return res;
+        } catch (ExecutionException e) {
+            throw new RuntimeException(e);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

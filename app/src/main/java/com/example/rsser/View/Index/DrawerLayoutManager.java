@@ -5,6 +5,7 @@ import android.content.Context;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
+import android.widget.Toast;
 
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
@@ -13,8 +14,11 @@ import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.rsser.DAO.Source;
 import com.example.rsser.R;
 import com.google.android.material.navigation.NavigationView;
+
+import java.util.List;
 
 public class DrawerLayoutManager extends BaseIndexManager {
     private DrawerLayout drawerLayout;
@@ -22,6 +26,10 @@ public class DrawerLayoutManager extends BaseIndexManager {
     private NavigationView navigationView;
     private RecyclerView recyclerView;
     private AppCompatActivity activity;
+    public interface onItemSelected {
+        void onItemSelected(int sid);
+    }
+    private onItemSelected onItemSelectedListener;
 
     public DrawerLayoutManager(Context context) {
         super(context);
@@ -29,13 +37,14 @@ public class DrawerLayoutManager extends BaseIndexManager {
         this.threshold = calculateThreshold(context);
     }
 
-    public void setupDrawerLayout(DrawerLayout drawerLayout, RecyclerView recyclerView) {
+    public void setupDrawerLayout(DrawerLayout drawerLayout, RecyclerView recyclerView, List<Source> sourceList, onItemSelected onItemSelectedListener) {
         this.drawerLayout = drawerLayout;
         this.recyclerView = recyclerView;
         this.navigationView = drawerLayout.findViewById(R.id.nav_view);
+        this.onItemSelectedListener = onItemSelectedListener;
 
         // 设置菜单项点击事件
-        setupNavigationItemListener();
+        setupNavigationItemListener(sourceList);
 
         // 设置支持 ActionBar
         setupActionBar();
@@ -52,13 +61,18 @@ public class DrawerLayoutManager extends BaseIndexManager {
         // 设置 ActionBarDrawerToggle
         setupActionBarDrawerToggle();
     }
-
-    private void setupNavigationItemListener() {
+    // 菜单项点击事件
+    private void setupNavigationItemListener(List<Source> sourceList) {
+        navigationView.getMenu().clear();
+        for (Source s : sourceList) {
+            MenuItem item = navigationView.getMenu().add(0, s.getId(), 0, s.getTitle());
+        }
         navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(MenuItem item) {
-                drawerLayout.closeDrawer(GravityCompat.START);
-                return true;
+                    drawerLayout.closeDrawer(GravityCompat.START);
+                    onItemSelectedListener.onItemSelected(item.getItemId());
+                    return true;
             }
         });
     }
@@ -142,4 +156,10 @@ public class DrawerLayoutManager extends BaseIndexManager {
             drawerLayout.openDrawer(GravityCompat.START);
         }
     }
+
+    // 辅助方法：根据图标名称获取 Drawable 资源
+    private int getDrawableResource(String iconName) {
+        return activity.getResources().getIdentifier(iconName, "drawable", activity.getPackageName());
+    }
+
 }

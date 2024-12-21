@@ -1,9 +1,11 @@
 package com.example.rsser.View.Index;
 
+import android.app.AlertDialog;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -17,12 +19,15 @@ import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.rsser.DAO.Source;
+import com.example.rsser.DAO.Type;
 import com.example.rsser.Presenter.Index.Index;
 import com.example.rsser.R;
 import com.example.rsser.base.BasePresenter;
 import com.example.rsser.base.BaseView;
 import com.google.android.material.navigation.NavigationView;
 
+import java.util.ArrayList;
 import java.util.List;
 
 // 最终的Activity
@@ -30,11 +35,20 @@ public class IndexActivity extends BaseView implements MainViewInt {
     private Index indexPresenter;
     private MenuManager menuManager;
     private DrawerLayoutManager drawerLayoutManager;
+    private IndexAdpter adapter;
+    private TextView title;
+    private List<IndexAdpter.Item> currentItems;
+    private Source currentSource;
 
     @Override
     protected void onRestart() {
         super.onRestart();
-        loadData();
+        if (currentItems != null && currentSource != null) {
+            loadData(currentItems, "从缓存中读取", currentSource);
+        } else {
+            loadData();
+        }
+        initView();
     }
 
     @Override
@@ -46,6 +60,7 @@ public class IndexActivity extends BaseView implements MainViewInt {
         // 设置头部文字大小
         TextView textView = findViewById(R.id.headerIndex);
         textView.setTextSize(24);
+        adapter = new IndexAdpter(this);
 //        // mock
 //        List<Item> mockItems = Arrays.asList(
 //                new Item(1, "Sample Item Title 1", "http://samplelink1.com", "Sample item description 1", "Sample item content 1", System.currentTimeMillis()),
@@ -61,15 +76,20 @@ public class IndexActivity extends BaseView implements MainViewInt {
 //                new Source("https://www.theverge.com/rss/index.xml", "The Verge", "Covers the intersection of technology, science, art, and culture", "RSS", System.currentTimeMillis())
 //        );
 //        indexPresenter.tempSaveS(mockSources);
-        // 初始化管理器
+        // 初始化管理器`
         menuManager = new MenuManager(this);
         drawerLayoutManager = new DrawerLayoutManager(this);
+        currentSource = new Source("","无内容","无内容","rss2.0",0,1);
+        currentItems = new ArrayList<>();
         initPresenter();
+        onFirstInitOverAll();
         initView();
         loadData();
     }
 
     private void initView() {
+        title = findViewById(R.id.headerIndex);
+        headerEvent();
         // 初始化视图组件
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -83,8 +103,20 @@ public class IndexActivity extends BaseView implements MainViewInt {
         // 设置RecyclerView布局
         LinearLayoutManager layoutManager = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
         recyclerView.setLayoutManager(layoutManager);
-
-        drawerLayoutManager.setupDrawerLayout(drawerLayout, recyclerView);
+        List<Source> sourceList = loadSources();
+        List<Source> total = new ArrayList<>();
+        total = sourceList;
+        if (sourceList == null) {
+            List<Source> sourceList_new = new ArrayList<>();
+            sourceList_new.add(new Source("","无数据","无数据","1",12312312,1));
+            total = sourceList_new;
+        }
+        drawerLayoutManager.setupDrawerLayout(drawerLayout, recyclerView, total, new DrawerLayoutManager.onItemSelected() {
+            @Override
+            public void onItemSelected(int sid) {
+                loadData(sid);
+            }
+        });
     }
 
     public void deleteDatabase(Context context) {
@@ -124,6 +156,12 @@ public class IndexActivity extends BaseView implements MainViewInt {
         data = data - 100L * 24 * 60 * 60 * 1000;
         indexPresenter.loadRecommendation(sid, data);
     }
+    public void loadData(int sid) {
+        long data = System.currentTimeMillis();
+        // 获取100天前的数据
+        data = data - 100L * 24 * 60 * 60 * 1000;
+        indexPresenter.loadRecommendation(sid, data);
+    }
 
     // SharedPreferences 相关方法
     private int getSid() {
@@ -151,13 +189,66 @@ public class IndexActivity extends BaseView implements MainViewInt {
 
     // 加载数据到RecyclerView的方法
     @Override
-    public void loadData(List<IndexAdpter.Item> itemList, String msg) {
-        if (itemList != null && !itemList.isEmpty()) {
-            RecyclerView recyclerView = findViewById(R.id.indexCycle);
-            recyclerView.setLayoutManager(new LinearLayoutManager(this));
-            IndexAdpter adapter = new IndexAdpter(this, itemList);
-            recyclerView.setAdapter(adapter);
+    public void loadData(List<IndexAdpter.Item> itemList, String msg, Source source) {
+        if (source != null) {
+            title.setText(source.getTitle());
+            title.setTag(source.getId());
         }
+        RecyclerView recyclerView = findViewById(R.id.indexCycle);
+        if (itemList != null && !itemList.isEmpty()) {
+            adapter.clear();
+            adapter.addAll(itemList);
+            currentItems = itemList;
+            currentSource = source;
+            recyclerView.setLayoutManager(new LinearLayoutManager(this));
+            recyclerView.setAdapter(adapter);
+        } else {
+            Toast.makeText(this, "没有可显示的数据", Toast.LENGTH_LONG).show();
+        }
+        System.out.println(msg);
         Toast.makeText(this, msg, Toast.LENGTH_LONG).show();
+    }
+    // 加载所有订阅源
+    public List<Source> loadSources() {
+        // 通知presenter， 给我订阅源
+        return indexPresenter.loadSources();
+    }
+    public void headerEvent() {
+        // 主页 标题点击事件
+        title.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                new AlertDialog.Builder(v.getContext())
+                        .setTitle("确认")
+                        .setMessage("设置为默认加载源") // 确认框的内容
+                        .setPositiveButton("确定", (dialog, which) -> {
+                            Toast.makeText(v.getContext(), "已确认", Toast.LENGTH_SHORT).show();
+                            Object tagObject = title.getTag();
+                            int sid = getSid();
+                            if (tagObject instanceof Integer) {
+                                sid = (Integer) tagObject;
+                            } else {
+                                Log.e("TAG", "Tag is not an Integer");
+                            }
+                            setSid(sid);
+                        })
+                        .setNegativeButton("取消", (dialog, which) -> {
+                            // 用户点击取消后的操作
+                            dialog.dismiss(); // 关闭对话框
+                        })
+                        .show(); // 显示对话框
+
+                return true; // 表示事件已处理
+            }
+        });
+    }
+
+    // 整个 APP 的启动工作，如： 创建默认类型文件夹,
+    public void onFirstInitOverAll() {
+        if (indexPresenter.isTypeEmpty()) {
+            // 如果空，就创建默认的
+            Type t = new Type("默认");
+            indexPresenter.insertType(t);
+        }
     }
 }

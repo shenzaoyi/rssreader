@@ -21,6 +21,11 @@ public class IndexAdpter extends RecyclerView.Adapter<IndexAdpter.ViewHolder> {
     private List<Item> itemList;
     private Context context;
 
+    public void clear() {
+        itemList.clear();
+        notifyDataSetChanged();
+    }
+
     // 数据模型类
     public static class Item {
         String title;
@@ -46,7 +51,10 @@ public class IndexAdpter extends RecyclerView.Adapter<IndexAdpter.ViewHolder> {
         this.context = context;
         this.itemList = itemList;
     }
-
+    public IndexAdpter(Context context) {
+        this.context = context;
+        this.itemList = new java.util.ArrayList<>();
+    }
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -73,6 +81,10 @@ public class IndexAdpter extends RecyclerView.Adapter<IndexAdpter.ViewHolder> {
         });
     }
 
+    public void addAll(List<Item> newItems) {
+        itemList.addAll(newItems); // 将新的项添加到适配器列表
+        notifyDataSetChanged(); // 通知适配器数据已更改
+    }
     @Override
     public int getItemCount() {
         return itemList.size();

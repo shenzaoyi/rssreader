@@ -28,4 +28,6 @@ public interface ItemDao {
     // 根据 ID 查询指定的 RSS 项目
     @Query("SELECT * FROM rss_item WHERE id = :id")
     Item getItemById(int id);
+    @Query("DELETE FROM rss_item WHERE sourceId = :sourceId")
+    void deleteItemsBySourceId(int sourceId);
 }

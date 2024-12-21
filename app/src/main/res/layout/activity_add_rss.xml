@@ -61,6 +61,13 @@
         android:text="解析" />
 
     <Button
+        android:id="@+id/btn_select_type"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="选择类型"
+        android:layout_marginTop="16dp" />
+
+    <Button
         android:id="@+id/btn_add"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

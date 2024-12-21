@@ -18,4 +18,5 @@ public interface IndexInterface {
     boolean isSourExist(int sid);
     Source getFirstSource();
     Source getSourceById(int sid);
+    List<Source> getAllSources();
 }

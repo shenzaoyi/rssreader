@@ -4,6 +4,7 @@ import com.example.rsser.DAO.Callback;
 import com.example.rsser.DAO.Item;
 import com.example.rsser.DAO.Respositories;
 import com.example.rsser.DAO.Source;
+import com.example.rsser.DAO.Type;
 import com.example.rsser.base.BaseModel;
 
 import java.util.List;
@@ -69,6 +70,7 @@ public class IndexModel extends BaseModel implements IndexInterface{
         if (callback.items == null) {
             return null;
         }
+        System.out.println(callback.items.size());
         return callback.items;
     }
     public class callbackIsSourceExist implements Callback.onSourceExist{
@@ -124,6 +126,18 @@ public class IndexModel extends BaseModel implements IndexInterface{
         }
     }
 
+    @Override
+    public List<Source> getAllSources() {
+        Future<List<Source>> future = respos.getAllSources();
+        try {
+            List<Source> sources = future.get();
+            return sources;
+        } catch (InterruptedException | ExecutionException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
     public class callbackLoadRecommendation implements Callback.onSourceLoaded{
         private List<Source> items;
         private CountDownLatch countDownLatch;
@@ -146,5 +160,10 @@ public class IndexModel extends BaseModel implements IndexInterface{
     public void initRepo(Respositories respositories) {
         this.respos = respositories;
     }
-
+    public boolean isEmptyType() {
+        return respos.isTypeEmpty();
+    }
+    public void insertType(Type t) {
+        respos.insertType(t);
+    }
 }

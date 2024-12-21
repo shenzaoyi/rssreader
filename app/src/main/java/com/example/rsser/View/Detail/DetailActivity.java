@@ -7,8 +7,12 @@ import android.text.SpannableString;
 import android.text.Spanned;
 import android.text.method.LinkMovementMethod;
 import android.text.style.ClickableSpan;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.webkit.WebView;
+import android.widget.ImageView;
+import android.widget.PopupMenu;
 import android.widget.TextView;
 
 import androidx.annotation.Nullable;
@@ -26,6 +30,24 @@ public class DetailActivity extends BaseView implements DetailInt {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_detail);
         loadData();
+        menuMan();
+    }
+    private void menuMan() {
+        // Return button
+        ImageView backbtn = findViewById(R.id.back_button);
+        backbtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                finish();
+            }
+        });
+        ImageView menubtn = findViewById(R.id.more_button);
+        menubtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                showPopupMenu(v);
+            }
+        });
     }
     private void loadData(){
         Intent intent = getIntent();
@@ -69,5 +91,21 @@ public class DetailActivity extends BaseView implements DetailInt {
     @Override
     protected BasePresenter getPresenter() {
         return this.detailPresenter;
+    }
+    private void showPopupMenu(View view) {
+        // 创建 PopupMenu
+        PopupMenu popupMenu = new PopupMenu(this, view);
+        popupMenu.getMenuInflater().inflate(R.menu.detail_pop, popupMenu.getMenu());
+
+        // 设置菜单项的点击事件
+        popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem item) {
+                return true;
+            }
+        });
+
+        // 显示弹出菜单
+        popupMenu.show();
     }
 }

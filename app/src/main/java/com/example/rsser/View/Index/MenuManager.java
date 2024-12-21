@@ -9,6 +9,7 @@ import android.widget.Toast;
 
 import com.example.rsser.R;
 import com.example.rsser.View.RssManager.AddRssActivity; // 导入添加RSS的Activity
+import com.example.rsser.View.RssManager.RssTypeAct;
 
 // 抽取菜单管理
 public class MenuManager extends BaseIndexManager {
@@ -48,6 +49,7 @@ public class MenuManager extends BaseIndexManager {
     }
 
     private void handleManageSources() {
-        Toast.makeText(context, "管理RSS源", Toast.LENGTH_SHORT).show();
+        Intent intent = new Intent(context, RssTypeAct.class);
+        context.startActivity(intent);
     }
 }
