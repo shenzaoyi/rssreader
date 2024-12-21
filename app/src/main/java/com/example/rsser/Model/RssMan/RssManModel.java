@@ -66,4 +66,15 @@ public class RssManModel extends BaseModel implements RssManModelInt {
             throw new RuntimeException(e);
         }
     }
+    public Source getSourceByUrl(String url){
+        Future<Source> f = respos.GetSouByUrl(url);
+        try {
+            Source s = f.get();
+            return s;
+        } catch (ExecutionException e) {
+            throw new RuntimeException(e);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+    }
 }

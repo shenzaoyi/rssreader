@@ -42,4 +42,8 @@ public class RssManPresenter extends BasePresenter<AddRssActivity> implements Rs
     public long addType(Type t) {
         return rssManModel.addType(t);
     }
+    public boolean isExist(String url) {
+        Source s = rssManModel.getSourceByUrl(url);
+        return s != null;
+    }
 }

@@ -130,6 +130,11 @@ public class Respositories {
             return sourceDao.getSourceById(id);
         });
     }
+    public Future<Source> GetSouByUrl(String url) {
+        return executorService.submit(() -> {
+            return sourceDao.getSourceByUrl(url);
+        });
+    }
     public Future<Long> insertSou(Source source) {
         return executorService.submit(()->{
            Long sid = sourceDao.insert(source);
@@ -164,7 +169,16 @@ public class Respositories {
             updateType(t);
         });
     }
-
+    public Future<List<Source>> getSourceByTid(int tid) {
+        return executorService.submit(()->{
+            return sourceDao.getSourcesByTypeId(tid);
+        });
+    }
+    public void updateSource(Source source) {
+        executorService.submit(()->{
+            sourceDao.update(source);
+        });
+    }
 // TYPE OPERATION
     public boolean isTypeEmpty() {
         ExecutorService executorService = Executors.newSingleThreadExecutor();

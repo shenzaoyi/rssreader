@@ -30,14 +30,15 @@ import com.google.android.material.bottomsheet.BottomSheetDialog;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 public class AddRssActivity extends BaseView {
 
     private EditText etRssLink;
-    private TextView tvTitle;
-    private TextView tvDescription;
+    private EditText tvTitle;
+    private EditText tvDescription;
     private Button btnParse, btnAdd, btnSelectType;
     private ProgressBar progressBar;
     private RssManPresenter rssManPresenter;
@@ -52,7 +53,7 @@ public class AddRssActivity extends BaseView {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_rss);
-        items = new ArrayList<>();
+        items = new CopyOnWriteArrayList<>();
 
         etRssLink = findViewById(R.id.et_rss_link);
         tvTitle = findViewById(R.id.tv_title);
@@ -75,11 +76,18 @@ public class AddRssActivity extends BaseView {
         btnAdd.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                addSource();
+                // 如果存在
+                if (rssManPresenter.isExist(source.getUrl())) {
+                    Toast.makeText(AddRssActivity.this, "此订阅源已经存在",Toast.LENGTH_LONG).show();
+                    onFail();
+                }else{
+                    source.setTitle(tvTitle.getText().toString());
+                    source.setDescription(tvDescription.getText().toString());
+                    addSource();
+                }
             }
         });
         manageType();
-
     }
     private void fetchRssInBackground(String url) {
         ExecutorService executor = Executors.newSingleThreadExecutor();
@@ -147,9 +155,27 @@ public class AddRssActivity extends BaseView {
         });
     }
     public void addSource() {
-        rssManPresenter.saveSource(source, items);
+        try {
+            List<Item> itemlist = items;
+            rssManPresenter.saveSource(source, itemlist); // 添加成功的处理
+            onSuccess();
+        } catch (Exception e) {
+            // 添加失败的处理
+            onFail();
+        }
     }
-
+    private void onFail() {
+        Toast.makeText(this, "添加失败, 请检查输入", Toast.LENGTH_LONG).show();
+        // 清空输入框和相关数据
+        clearInputs();
+    }
+    private void clearInputs() {
+        etRssLink.setText("");
+        tvTitle.setText("");
+        tvDescription.setText("");
+        items.clear();
+        source = null;
+    }
     @Override
     protected void initPresenter() {
         this.rssManPresenter = new RssManPresenter(AddRssActivity.this);
@@ -162,6 +188,7 @@ public class AddRssActivity extends BaseView {
     public void onSuccess(){
         System.out.println("添加成功");
         Toast.makeText(this, "添加成功!", Toast.LENGTH_LONG).show();
+        clearInputs();
     }
     public void manageType() {
         typeList = new ArrayList<>();
@@ -216,26 +243,39 @@ public class AddRssActivity extends BaseView {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("新建类型");
 
-        // 添加 EditText 让用户输入
-        EditText editText = new EditText(this);
-        builder.setView(editText);
+        // 加载自定义布局
+        View customView = LayoutInflater.from(this).inflate(R.layout.dialog_add_type, null);
+        EditText editTextTypeName = customView.findViewById(R.id.editTextTypeName);
+        EditText editTextTypeDesc = customView.findViewById(R.id.editTextTypeDesc);
+        Button buttonCancel = customView.findViewById(R.id.buttonCancel);
+        Button buttonSave = customView.findViewById(R.id.buttonSave);
 
-        builder.setPositiveButton("确定", (dialog, which) -> {
-            String newTypeName = editText.getText().toString().trim();
+        builder.setView(customView);
+        AlertDialog dialog = builder.create();
+
+        buttonCancel.setOnClickListener(v -> dialog.dismiss());
+        buttonSave.setOnClickListener(v -> {
+            String newTypeName = editTextTypeName.getText().toString().trim();
+            String newTypeDesc = editTextTypeDesc.getText().toString().trim();
             Type newType = new Type(newTypeName);
-            // store type
+            newType.setDescription(newTypeDesc);
+
+            // 保存新类型
             long id = rssManPresenter.addType(newType);
             newType.setId((int) id);
+
             if (!newTypeName.isEmpty()) {
                 // 将新类型添加到列表中
                 typeList.add(newType);
                 adapter.notifyItemInserted(typeList.size() - 1);
                 selectedType = newType.getName(); // 选择新建的类型
                 Toast.makeText(this, "已添加新类型：" + newType, Toast.LENGTH_SHORT).show();
+                dialog.dismiss(); // 关闭对话框
+            } else {
+                Toast.makeText(this, "请输入类型名称", Toast.LENGTH_SHORT).show();
             }
         });
-        builder.setNegativeButton("取消", null);
 
-        builder.show();
+        dialog.show();
     }
 }

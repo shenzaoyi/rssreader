@@ -17,7 +17,7 @@
         android:layout_height="wrap_content"
         android:layout_gravity="end"
         android:layout_margin="16dp"
-        android:text="新建订阅源" />
+        android:text="别点，暂时没想好干啥" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerViewSource"

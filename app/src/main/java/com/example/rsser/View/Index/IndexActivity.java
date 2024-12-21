@@ -111,7 +111,7 @@ public class IndexActivity extends BaseView implements MainViewInt {
             sourceList_new.add(new Source("","无数据","无数据","1",12312312,1));
             total = sourceList_new;
         }
-        drawerLayoutManager.setupDrawerLayout(drawerLayout, recyclerView, total, new DrawerLayoutManager.onItemSelected() {
+        drawerLayoutManager.setupDrawerLayout(getSid(),drawerLayout, recyclerView, total, new DrawerLayoutManager.onItemSelected() {
             @Override
             public void onItemSelected(int sid) {
                 loadData(sid);
@@ -231,6 +231,7 @@ public class IndexActivity extends BaseView implements MainViewInt {
                                 Log.e("TAG", "Tag is not an Integer");
                             }
                             setSid(sid);
+                            drawerLayoutManager.focusChange(getSid());
                         })
                         .setNegativeButton("取消", (dialog, which) -> {
                             // 用户点击取消后的操作

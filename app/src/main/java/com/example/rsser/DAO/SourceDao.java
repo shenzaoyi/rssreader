@@ -42,6 +42,8 @@ public interface SourceDao {
     @Query("SELECT * FROM rss_source WHERE id = :id")
     Source getSourceById(int id);
 
+    @Query("SELECT * FROM rss_source WHERE url = :url")
+    Source getSourceByUrl(String url);
     // 检查是否存在指定 id 且 last_updated > 指定日期的 RSS 源
     @Query("SELECT * FROM rss_source WHERE id = :id AND last_updated > :date")
     List<Source> getSourcesByIdAndDate(int id, long date);

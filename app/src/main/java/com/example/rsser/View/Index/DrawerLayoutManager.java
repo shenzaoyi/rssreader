@@ -1,7 +1,10 @@
 package com.example.rsser.View.Index;
 
+import static android.content.Context.MODE_PRIVATE;
+
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
@@ -30,6 +33,8 @@ public class DrawerLayoutManager extends BaseIndexManager {
         void onItemSelected(int sid);
     }
     private onItemSelected onItemSelectedListener;
+    private int sid;
+    private List<Source> sourcesList;
 
     public DrawerLayoutManager(Context context) {
         super(context);
@@ -37,13 +42,15 @@ public class DrawerLayoutManager extends BaseIndexManager {
         this.threshold = calculateThreshold(context);
     }
 
-    public void setupDrawerLayout(DrawerLayout drawerLayout, RecyclerView recyclerView, List<Source> sourceList, onItemSelected onItemSelectedListener) {
+    public void setupDrawerLayout(int id, DrawerLayout drawerLayout, RecyclerView recyclerView, List<Source> sourceList, onItemSelected onItemSelectedListener) {
         this.drawerLayout = drawerLayout;
         this.recyclerView = recyclerView;
         this.navigationView = drawerLayout.findViewById(R.id.nav_view);
         this.onItemSelectedListener = onItemSelectedListener;
+        this.sid = id;
 
         // 设置菜单项点击事件
+        this.sourcesList = sourceList;
         setupNavigationItemListener(sourceList);
 
         // 设置支持 ActionBar
@@ -66,6 +73,9 @@ public class DrawerLayoutManager extends BaseIndexManager {
         navigationView.getMenu().clear();
         for (Source s : sourceList) {
             MenuItem item = navigationView.getMenu().add(0, s.getId(), 0, s.getTitle());
+            if (s.getId() == sid) {
+                item.setIcon(R.drawable.star);
+            }
         }
         navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
             @Override
@@ -76,7 +86,10 @@ public class DrawerLayoutManager extends BaseIndexManager {
             }
         });
     }
-
+    public void focusChange(int sid) {
+        this.sid = sid;
+        setupNavigationItemListener(sourcesList);
+    }
     private void setupActionBar() {
         if (activity.getSupportActionBar() != null) {
             activity.getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -161,5 +174,4 @@ public class DrawerLayoutManager extends BaseIndexManager {
     private int getDrawableResource(String iconName) {
         return activity.getResources().getIdentifier(iconName, "drawable", activity.getPackageName());
     }
-
 }

@@ -21,14 +21,6 @@ public class SourceAdapter extends RecyclerView.Adapter<SourceAdapter.ViewHolder
         this.sourceList = sourceList;
     }
 
-    public void setOnItemClickListener(OnItemClickListener listener) {
-        this.onItemClickListener = listener;
-    }
-
-    public void setOnItemLongClickListener(OnItemLongClickListener listener) {
-        this.onItemLongClickListener = listener;
-    }
-
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -44,13 +36,13 @@ public class SourceAdapter extends RecyclerView.Adapter<SourceAdapter.ViewHolder
 
         holder.itemView.setOnClickListener(v -> {
             if (onItemClickListener != null) {
-                onItemClickListener.onItemClick(source);
+                onItemClickListener.onItemClick(v, source);
             }
         });
 
         holder.itemView.setOnLongClickListener(v -> {
             if (onItemLongClickListener != null) {
-                onItemLongClickListener.onItemLongClick(source);
+                onItemLongClickListener.onItemLongClick(v, source);
             }
             return true;
         });
@@ -71,10 +63,18 @@ public class SourceAdapter extends RecyclerView.Adapter<SourceAdapter.ViewHolder
     }
 
     public interface OnItemClickListener {
-        void onItemClick(Source source);
+        void onItemClick(View view, Source source);
     }
 
     public interface OnItemLongClickListener {
-        void onItemLongClick(Source source);
+        void onItemLongClick(View view, Source source);
+    }
+
+    public void setOnItemClickListener(OnItemClickListener listener) {
+        this.onItemClickListener = listener;
+    }
+
+    public void setOnItemLongClickListener(OnItemLongClickListener listener) {
+        this.onItemLongClickListener = listener;
     }
 }
